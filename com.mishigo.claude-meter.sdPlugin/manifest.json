@@ -1,0 +1,32 @@
+{
+  "Author": "Ali Elgin",
+  "CodePath": "bin/plugin.js",
+  "Description": "Animated Claude API usage meter for Stream Deck",
+  "Name": "Claude Meter",
+  "Icon": "icons/plugin",
+  "Category": "Claude Meter",
+  "CategoryIcon": "icons/plugin",
+  "Nodejs": { "Version": "20", "Debug": "enabled" },
+  "SDKVersion": 2,
+  "Software": { "MinimumVersion": "6.4" },
+  "OS": [
+    { "Platform": "windows", "MinimumVersion": "10" },
+    { "Platform": "mac", "MinimumVersion": "10.15" }
+  ],
+  "Version": "1.0.0.0",
+  "UUID": "com.mishigo.claude-meter",
+  "Actions": [
+    {
+      "UUID": "com.mishigo.claude-meter.meter",
+      "Name": "Claude Meter",
+      "Icon": "icons/action",
+      "Controllers": ["Keypad"],
+      "States": [
+        {
+          "Image": "icons/action",
+          "TitleAlignment": "bottom"
+        }
+      ]
+    }
+  ]
+}
