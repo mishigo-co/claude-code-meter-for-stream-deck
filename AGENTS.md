@@ -8,13 +8,14 @@ Stream Deck plugin (Node, TypeScript). The README covers setup, hooks, and archi
 - **`@action` decorator key is `UUID` (uppercase).** Lowercase `uuid` silently leaves `manifestId` undefined and `registerAction` throws at startup.
 - **`manifest.json` silent-failure fields:** `Nodejs.Version: "20"` is mandatory — without it Stream Deck never launches the plugin process and gives no error. `Version` must be 4-part (`1.0.0.0`). `CategoryIcon` is required whenever `Category` is set. `OS` is required.
 
-## Renderer
+## Renderer & characters
 
-The live animation is the pixel-art character in `src/utils/renderCharacter.ts` — that's what `src/actions/claude-meter.ts` imports. The README's "Customisation" section still points at a `render.ts` (color/speed/grid constants) that no longer exists — it is stale; edit `renderCharacter.ts` instead.
+The animation is rendered as SVG in `src/utils/renderCharacter.ts` (face expressions + motion, shared by all characters). The body silhouette and palette come from a data-driven **character pack** in `src/utils/characters.ts`. Packs supply only `base` (12×12 grid) + `palette`; eyes/mouth/motion stay procedural — keep that split. The `claude` pack there must stay pixel-identical to the original hand-coded body (it's derived from the old `drawBase`); the smoke-test approach in the build section guards this.
 
-## Build / reload
+## Build / typecheck / reload
 
-- `npm run build` runs tsup with `clean: true`, wiping and rewriting `com.mishigo.claude-meter.sdPlugin/bin/`. That dir is gitignored and generated — never edit it by hand.
+- `npm run build` runs **two** tsup builds: the Node plugin → `bin/plugin.js`, and the browser property inspector (`src/ui/inspector.ts` → `ui/inspector.js`). The plugin build has `clean: true`; the PI build has `clean: false` so it doesn't wipe the committed `ui/inspector.html`. Generated `bin/` and `ui/inspector.js` are gitignored — never hand-edit.
+- **`tsc --noEmit` is NOT a usable gate here.** The `@elgato/streamdeck` package has a dual `exports` map (`browser` + `default`); under `moduleResolution: NodeNext`, `tsc` resolves *every* file to the **browser** types, so the plugin's `SingletonAction`/`@action`/event imports all report "no exported member". esbuild (tsup) resolves correctly per `platform` (`node` for the plugin, `browser` for the PI) — it is the real build gate, but it strips types and never type-checks. To actually exercise pure logic (renderer + packs), bundle a throwaway entry with `npx esbuild <file> --bundle --platform=node` and run it.
 - After a rebuild the running plugin keeps the old bundle. Run `npx streamdeck restart com.mishigo.claude-meter` to load changes.
 
 ## Hooks

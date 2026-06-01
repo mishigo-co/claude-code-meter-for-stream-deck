@@ -121,24 +121,57 @@ npx streamdeck restart com.mishigo.claude-meter   # restart plugin after rebuild
 
 ### Customisation
 
-**Color scheme** — edit the constants at the top of `src/utils/render.ts`:
-
-```typescript
-const FILL     = "#CC0000";   // main fill color
-const FILL_TIP = "#FF3333";   // leading edge
-const EMPTY    = "#222222";   // unfilled blocks
-const BG       = "#000000";   // background
-```
-
-**Animation speed** — in `src/utils/render.ts`, change the phase increment:
+**Animation speed** — in `src/utils/renderCharacter.ts`, change the phase increment in the
+50 ms tick (`src/actions/claude-meter.ts`):
 
 ```typescript
 this.phase = (this.phase + 0.02) % 1;  // smaller = slower
 ```
 
-**Token cap** — set `maxTokens` per-key in the Stream Deck UI (default: 200,000).
+For colours and the character itself, see **Characters** below.
 
-**Grid size** — change `COLS` and `ROWS` in `render.ts` (currently 4×5 = 20 blocks).
+---
+
+## Characters
+
+The animated face is a **character pack** — a small JSON file holding a 12×12 base silhouette and a
+colour palette. The face expressions and motion (blink, thinking dots, Z's, sparkles, typing bars)
+are shared in code, so every character animates the same way; packs only change the body shape and
+colours.
+
+**Pick a character** — select the key in Stream Deck and use the **Character** dropdown in the
+property inspector. Seven are bundled: Claude, Robo, Cat, Ghost, Slime, Alien, Pumpkin.
+
+**Import your own** — click **Import character…** in the property inspector and choose a `.json` pack.
+Imported packs are stored in the plugin's global settings (no files to manage) and appear in the
+dropdown for every key. Bad files are rejected with an inline error.
+
+**Pack format** (`schema: 1`):
+
+```jsonc
+{
+  "schema": 1,
+  "id": "robo",            // unique id; re-importing the same id replaces it
+  "name": "Robo",          // shown in the dropdown
+  "palette": {             // all nine roles required, each a #rrggbb hex
+    "bg": "#000000", "body": "#22AACC", "shade": "#116688", "hilit": "#66E0FF",
+    "white": "#FFFFFF", "pupil": "#001824", "dark": "#002A38", "gray": "#557788", "lgray": "#99CCDD"
+  },
+  // 12 rows × 12 chars. Legend: '.'=transparent  B=body S=shade H=hilit W=white D=dark G=gray L=lgray
+  "base": [
+    "....HH......", "....SS......", ".SSSSSSSSSS.", ".SBBBBBBBBS.",
+    ".SBBBBBBBBS.", ".SBBBBBBBBS.", ".SBBBBBBBBS.", ".SSSSSSSSSS.",
+    "...S.SS.S...", "..SBBBBBBS..", "..SBBBBBBS..", "..S.SSSS.S.."
+  ],
+  // optional — nudge the shared eyes/mouth to fit your silhouette (defaults shown)
+  "anchors": { "eyeLeftX": 3, "eyeRightX": 7, "eyesY": 3, "mouthX": 4, "mouthY": 6 }
+}
+```
+
+The bundled packs in `src/utils/characters.ts` are the canonical worked examples. To change Claude's
+colours, edit the `claude` pack's `palette` there.
+
+**Token cap** — currently fixed at 200,000 (the fill strip at the bottom of the key).
 
 ---
 
@@ -151,18 +184,23 @@ streamdeck-claude-meter/
 │   ├── server.ts              # HTTP server on :3141
 │   ├── actions/
 │   │   └── claude-meter.ts    # Stream Deck action, 50ms animation tick
+│   ├── ui/
+│   │   └── inspector.ts       # property inspector logic (bundled to browser)
 │   └── utils/
-│       ├── render.ts          # SVG frame renderer
-│       └── frames.ts          # GIF frame loader (for future use)
+│       ├── renderCharacter.ts # procedural SVG face + motion
+│       └── characters.ts      # character pack model, registry, validation
 ├── hooks/
 │   ├── pre-tool-use.sh        # fires before each tool call
 │   ├── post-tool-use.sh       # fires after each tool call
 │   └── stop.sh                # fires on session end
 ├── com.mishigo.claude-meter.sdPlugin/
 │   ├── manifest.json          # Stream Deck plugin manifest
-│   ├── bin/plugin.js          # compiled bundle (generated)
-│   └── icons/                 # key icons and GIF assets
-├── tsup.config.ts
+│   ├── bin/plugin.js          # compiled plugin bundle (generated)
+│   ├── ui/
+│   │   ├── inspector.html     # property inspector markup
+│   │   └── inspector.js       # compiled PI bundle (generated)
+│   └── icons/                 # key icons
+├── tsup.config.ts             # two builds: Node plugin + browser PI
 └── tsconfig.json
 ```
 

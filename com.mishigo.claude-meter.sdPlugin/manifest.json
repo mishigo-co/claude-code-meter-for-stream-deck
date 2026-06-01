@@ -20,6 +20,7 @@
       "UUID": "com.mishigo.claude-meter.meter",
       "Name": "Claude Meter",
       "Icon": "icons/action",
+      "PropertyInspectorPath": "ui/inspector.html",
       "Controllers": ["Keypad"],
       "States": [
         {

@@ -1,5 +1,6 @@
 node_modules/
 com.mishigo.claude-meter.sdPlugin/bin/
+com.mishigo.claude-meter.sdPlugin/ui/inspector.js
 com.mishigo.claude-meter.sdPlugin/logs/
 logs/
 .claude/

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Claude Meter</title>
+  <style>
+    :root { color-scheme: dark; }
+    body {
+      margin: 0;
+      padding: 12px 14px;
+      font: 13px/1.4 "Segoe UI", -apple-system, sans-serif;
+      color: #d8d8d8;
+      background: #2d2d2d;
+    }
+    .item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    label {
+      flex: 0 0 84px;
+      text-align: right;
+      color: #969696;
+    }
+    select, button {
+      flex: 1;
+      min-height: 26px;
+      padding: 2px 6px;
+      color: #d8d8d8;
+      background: #3d3d3d;
+      border: 1px solid #1a1a1a;
+      border-radius: 4px;
+      font: inherit;
+    }
+    button { cursor: pointer; }
+    button:hover { background: #484848; }
+    #status {
+      min-height: 16px;
+      margin-left: 92px;
+      font-size: 12px;
+    }
+    #status.ok { color: #6ac46a; }
+    #status.error { color: #e06464; }
+  </style>
+</head>
+<body>
+  <div class="item">
+    <label for="character">Character</label>
+    <select id="character"></select>
+  </div>
+  <div class="item">
+    <label></label>
+    <button id="import-btn" type="button">Import character…</button>
+    <input id="import-file" type="file" accept=".json,application/json" hidden />
+  </div>
+  <div id="status"></div>
+
+  <script type="module" src="./inspector.js"></script>
+</body>
+</html>

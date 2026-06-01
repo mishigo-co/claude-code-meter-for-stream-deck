@@ -15,4 +15,9 @@ startServer(3141, (update) => {
 });
 
 streamDeck.actions.registerAction(meter);
-streamDeck.connect();
+
+// Property-inspector RPC: list characters and import new packs.
+streamDeck.ui.registerRoute("/characters", () => meter.characterList());
+streamDeck.ui.registerRoute("/import", (req) => meter.importPack(req.body));
+
+streamDeck.connect().then(() => meter.loadGlobalSettings());
