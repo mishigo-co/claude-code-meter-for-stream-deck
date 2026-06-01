@@ -206,6 +206,14 @@ property-inspector webview on macOS can't reliably read user-picked files.)
 
 ### Make your own character
 
+The fastest path is the **visual editor** — open it live at
+[mishigo-co.github.io/context-meter-for-stream-deck](https://mishigo-co.github.io/context-meter-for-stream-deck/)
+(or [`docs/index.html`](docs/index.html) locally). You get a paintable grid, palette pickers, a live
+preview cycling through every state, and a JSON box you copy into the property inspector's
+**Import character…**. Load an existing pack into it to remix one.
+
+If you'd rather hand-author the JSON:
+
 1. **Start from the template** below (or copy any bundled pack from `src/utils/characters.ts`) into a
    new file, e.g. `mychar.json`. Give it a unique `id` and a `name` for the dropdown.
 
@@ -287,9 +295,14 @@ context-meter-for-stream-deck/
 │   │   └── meter.ts           # Stream Deck action, 50ms animation tick
 │   ├── ui/
 │   │   └── inspector.ts       # property inspector logic (bundled to browser)
+│   ├── editor/
+│   │   └── main.ts            # standalone character-pack editor (bundled to browser)
 │   └── utils/
 │       ├── renderCharacter.ts # procedural SVG face + motion
 │       └── characters.ts      # character pack model, registry, validation
+├── docs/
+│   ├── index.html             # standalone visual character-pack editor (served via GitHub Pages)
+│   └── editor.js              # compiled editor bundle (generated)
 ├── hooks/
 │   ├── pre-tool-use.sh        # fires before each tool call
 │   ├── post-tool-use.sh       # fires after each tool call

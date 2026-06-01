@@ -14,6 +14,10 @@ The animation is rendered as SVG in `src/utils/renderCharacter.ts` (face express
 
 Packs can declare `grid: 12` (default, 6px blocks) or `grid: 24` (3px blocks, smoother silhouette + room for soft shading). All bundled packs are 24; imported user packs may be either. The face overlay and accessories (eyes, mouth, ZZZ, sparkles, typing bars, thinking dots) always render at 12-grid resolution — `anchors` and the bob offset are in 12-grid units regardless of body grid, so a body redrawn from 12 → 24 doesn't shift the face. When generating a 24-grid body, leave cols 6–17 / rows 6–15 solid `B` so the face overlay lands on body cells.
 
+## Visual editor
+
+`docs/index.html` is a standalone character-pack editor that reuses `renderCharacter.ts` for a live animated preview. Bundled by tsup from `src/editor/main.ts` to `docs/editor.js` as **IIFE** (not ESM), so the HTML loads via plain `<script src>` — `type="module"` is blocked by Chrome's CORS policy on `file://`. Served by GitHub Pages from the `/docs` folder of `main` (Settings → Pages → Source: Deploy from branch → main → /docs).
+
 ## Build / typecheck / reload
 
 - `npm run build` runs **two** tsup builds: the Node plugin → `bin/plugin.js`, and the browser property inspector (`src/ui/inspector.ts` → `ui/inspector.js`). The plugin build has `clean: true`; the PI build has `clean: false` so it doesn't wipe the committed `ui/inspector.html`. Generated `bin/` and `ui/inspector.js` are gitignored — never hand-edit.

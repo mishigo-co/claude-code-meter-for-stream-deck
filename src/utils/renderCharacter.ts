@@ -236,7 +236,8 @@ export function renderCharacter(opts: {
 		tokenBar +
 		`</svg>`;
 
-	return `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`;
+	// btoa is available in both Node (16+) and browsers; the SVG is pure ASCII so direct encoding is safe.
+	return `data:image/svg+xml;base64,${btoa(svg)}`;
 }
 
 export function fmtTokens(n: number): string {

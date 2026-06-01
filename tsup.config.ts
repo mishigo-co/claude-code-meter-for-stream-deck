@@ -15,7 +15,7 @@ export default defineConfig([
 		clean: true,
 		outExtension: () => ({ js: ".js" }),
 	},
-	// Property inspector (browser). Bundles the @elgato/streamdeck browser SDK.
+	// Property inspector (browser).
 	{
 		entry: { inspector: "src/ui/inspector.ts" },
 		outDir: `${PLUGIN}/ui`,
@@ -25,6 +25,20 @@ export default defineConfig([
 		target: "es2022",
 		noExternal: [/.*/],
 		clean: false, // keep inspector.html, which is a committed static asset
+		outExtension: () => ({ js: ".js" }),
+	},
+	// Standalone character-pack editor (browser; opened via file:// or GitHub Pages
+	// from /docs). IIFE format so the HTML can load it with a plain <script> tag —
+	// ES modules are blocked by Chrome's CORS policy on file:// URLs.
+	{
+		entry: { editor: "src/editor/main.ts" },
+		outDir: "docs",
+		format: ["iife"],
+		bundle: true,
+		platform: "browser",
+		target: "es2022",
+		noExternal: [/.*/],
+		clean: false, // keep editor/index.html, which is a committed static asset
 		outExtension: () => ({ js: ".js" }),
 	},
 ]);
