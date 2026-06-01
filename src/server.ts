@@ -4,6 +4,7 @@ export interface Update {
   tokens?: number;
   isThinking?: boolean;
   reset?: boolean;
+  complete?: boolean;
 }
 
 export function startServer(port: number, onUpdate: (u: Update) => void): void {
