@@ -168,6 +168,60 @@ dropdown for every key. Bad files are rejected with an inline error.
 }
 ```
 
+### Make your own character
+
+1. **Start from the template** below (or copy any bundled pack from `src/utils/characters.ts`) into a
+   new file, e.g. `mychar.json`. Give it a unique `id` and a `name` for the dropdown.
+
+2. **Draw the body** in `base` — 12 rows of **exactly 12 characters**. Each character is one 6×6px block:
+
+   | Char | Block | | Char | Block |
+   |------|-------|-|------|-------|
+   | `.` / space | transparent | | `D` | dark |
+   | `B` | body | | `W` | white |
+   | `S` | shade (outline/shadow) | | `G` | gray |
+   | `H` | highlight | | `L` | light gray |
+
+   Leave the **face zone** filled with `B`: the shared eyes land around columns 3–4 and 7–8 on rows 3–4,
+   and the mouth around columns 4–7 on row 6, so the body needs to be present behind them.
+
+3. **Pick colours** — set all nine `palette` roles to `#rrggbb` hex. `body` defines the look; you don't
+   choose the progress-bar colour — it's the complement of `body`, so it always contrasts.
+
+4. **(Optional) nudge the face** with `anchors` if your silhouette sits higher or lower than the default.
+
+5. **Import it** — in Stream Deck select the key → **Import character…** → choose your `.json`. It's
+   validated, added to the dropdown, and selected. Re-importing the same `id` replaces it; invalid files
+   show an inline error explaining what's wrong.
+
+Starter template (a plain rounded face — edit the grid and palette):
+
+```json
+{
+  "schema": 1,
+  "id": "mychar",
+  "name": "My Character",
+  "palette": {
+    "bg": "#000000", "body": "#3366CC", "shade": "#1E3E80", "hilit": "#88AAFF",
+    "white": "#FFFFFF", "pupil": "#0A1430", "dark": "#0E1E44", "gray": "#445588", "lgray": "#AAC0F0"
+  },
+  "base": [
+    "..SBBBBBBS..",
+    ".SBBBBBBBBS.",
+    ".SBBBBBBBBS.",
+    ".SBBBBBBBBS.",
+    ".SBBBBBBBBS.",
+    ".SBBBBBBBBS.",
+    ".SBBBBBBBBS.",
+    ".SBBBBBBBBS.",
+    ".SBBBBBBBBS.",
+    ".SBBBBBBBBS.",
+    ".SBBBBBBBBS.",
+    "..SSSSSSSS.."
+  ]
+}
+```
+
 The bundled packs in `src/utils/characters.ts` are the canonical worked examples. To change Claude's
 colours, edit the `claude` pack's `palette` there.
 
