@@ -4,16 +4,16 @@
   "CodePath": "bin/plugin.js",
   "Description": "Animated context-usage meter for Claude Code, on your Stream Deck.",
   "Name": "Context Meter",
-  "Icon": "icons/plugin",
+  "Icon": "imgs/plugin",
   "Category": "Context Meter",
-  "CategoryIcon": "icons/plugin",
+  "CategoryIcon": "imgs/plugin",
   "Nodejs": {
     "Version": "20",
     "Debug": "enabled"
   },
   "SDKVersion": 2,
   "Software": {
-    "MinimumVersion": "6.4"
+    "MinimumVersion": "6.6"
   },
   "OS": [
     {
@@ -31,14 +31,14 @@
     {
       "UUID": "com.mishigo.context-meter.meter",
       "Name": "Context Meter",
-      "Icon": "icons/action",
+      "Icon": "imgs/action",
       "PropertyInspectorPath": "ui/inspector.html",
       "Controllers": [
         "Keypad"
       ],
       "States": [
         {
-          "Image": "icons/action",
+          "Image": "imgs/action",
           "TitleAlignment": "bottom"
         }
       ]

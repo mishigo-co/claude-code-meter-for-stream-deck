@@ -2,7 +2,7 @@
 
 A real-time token/context usage meter for [Claude Code](https://claude.ai/code), shown on your Elgato Stream Deck. An animated character reacts as Claude Code works — thinking, generating, finishing — and a bar fills as your context grows, all driven by Claude Code's hook system.
 
-![Context Meter demo](com.mishigo.context-meter.sdPlugin/icons/action.png)
+![Context Meter demo](com.mishigo.context-meter.sdPlugin/imgs/action.png)
 
 ---
 
@@ -266,7 +266,7 @@ context-meter-for-stream-deck/
 │   ├── ui/
 │   │   ├── inspector.html     # property inspector markup
 │   │   └── inspector.js       # compiled PI bundle (generated)
-│   └── icons/                 # key icons
+│   └── imgs/                  # key icons (plugin + action, with @2x)
 ├── tsup.config.ts             # two builds: Node plugin + browser PI
 └── tsconfig.json
 ```
