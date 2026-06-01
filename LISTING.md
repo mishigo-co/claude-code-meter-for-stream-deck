@@ -15,7 +15,7 @@ generates, and finishes, while a bar fills to show how much of the context windo
 ## Long description
 **Context Meter** turns a Stream Deck key into a live status display for [Claude Code](https://claude.ai/code).
 
-A little pixel character reacts in real time as Claude Code works:
+A little character reacts in real time as Claude Code works:
 
 - **Thinking** — eyes up, bouncing dots, before each tool call
 - **Generating** — mouth open, typing bars, with a running token count
@@ -25,9 +25,10 @@ A little pixel character reacts in real time as Claude Code works:
 A thin bar across the bottom of the key fills as you consume the context window (200k tokens),
 in a colour chosen to contrast with whichever character you pick.
 
-**Make it yours.** Seven characters are bundled — Ember, Robo, Cat, Ghost, Slime, Alien, Pumpkin —
-selectable from the key's settings. You can also **import your own** from a small JSON "character
-pack" (silhouette + palette); it's added to the dropdown and shared across every key.
+**Make it yours.** Eight characters are bundled — Ember, Robo, Cat, Ghost, Slime, Alien, Pumpkin,
+Mochi — each hand-drawn on a smooth 24×24 grid with soft shading. Pick one from the key's settings,
+or **import your own** from a small JSON "character pack" (silhouette + palette); imports are added
+to the dropdown and shared across every key.
 
 **How it works.** Context Meter plugs into Claude Code's hook system. Three lightweight hooks POST
 to a local server the plugin runs on `127.0.0.1:3141` — that's the only thing it talks to. **Nothing
@@ -49,4 +50,4 @@ https://github.com/mishigo-co/context-meter-for-stream-deck
 
 ## Note on naming
 "Claude Code" is referenced nominatively (compatibility), not as the product name or branding. The
-product is "Context Meter"; the mascot is generic ("Ember").
+product is "Context Meter"; the mascots are all generic (Ember, Robo, Cat, etc).
