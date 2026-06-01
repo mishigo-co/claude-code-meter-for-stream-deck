@@ -1,5 +1,6 @@
 {
   "Author": "Ali Elgin",
+  "URL": "https://github.com/mishigo-co/claude-code-meter-for-stream-deck",
   "CodePath": "bin/plugin.js",
   "Description": "Animated context-usage meter for Claude Code, on your Stream Deck.",
   "Name": "Context Meter",
