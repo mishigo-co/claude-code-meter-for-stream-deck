@@ -58,6 +58,12 @@ After renaming: rebuild, re-link, `streamdeck validate`, and re-run the pack smo
 - Onboarding: the plugin needs Claude Code + manual `~/.claude/settings.json` hook edits. Tighten the
   setup docs; state plainly that nothing leaves `localhost:3141`.
 
+**Status (2026-06-01):**
+
+- macOS — all five states cycled via the live server; `streamdeck validate` clean. PI character dropdown + import test pending user click-through.
+- Windows — not yet verified. Decide before submit: test, or drop `windows` from `manifest.json` OS list.
+- Setup docs — tightened in `README.md` (Privacy section, "wire hooks" step rewritten, verify step, log-path fix).
+
 ## Phase 5 — Package & submit
 
 - `npx streamdeck pack com.mishigo.<new>.sdPlugin` → `.streamDeckPlugin`. Final `validate` should be
@@ -69,8 +75,11 @@ After renaming: rebuild, re-link, `streamdeck validate`, and re-run the pack smo
 ## Open questions
 
 - Final name + mascot name (Phase 1 confirm).
-- Free vs. paid listing (affects the Maker flow; assumed **free**).
-- Do you want to keep the GitHub repo name, or rename it to match?
+
+## Decisions
+
+- **Free listing.** Confirmed 2026-06-01.
+- **Repo renamed** to `mishigo-co/context-meter-for-stream-deck`. Confirmed 2026-06-01.
 
 ## Status
 
