@@ -36,8 +36,8 @@ Pick from several characters — or import your own — in the key's settings (s
 ### 1. Clone and build
 
 ```bash
-git clone https://github.com/mishigo-co/claude-code-meter-for-stream-deck
-cd streamdeck-claude-meter
+git clone https://github.com/mishigo-co/context-meter-for-stream-deck
+cd context-meter-for-stream-deck
 npm install
 npm run build
 ```
@@ -61,25 +61,25 @@ Add the following to your `~/.claude/settings.json`:
     "PreToolUse": [
       {
         "matcher": "",
-        "hooks": [{ "type": "command", "command": "bash /path/to/streamdeck-claude-meter/hooks/pre-tool-use.sh" }]
+        "hooks": [{ "type": "command", "command": "bash /path/to/context-meter-for-stream-deck/hooks/pre-tool-use.sh" }]
       }
     ],
     "PostToolUse": [
       {
         "matcher": "",
-        "hooks": [{ "type": "command", "command": "bash /path/to/streamdeck-claude-meter/hooks/post-tool-use.sh" }]
+        "hooks": [{ "type": "command", "command": "bash /path/to/context-meter-for-stream-deck/hooks/post-tool-use.sh" }]
       }
     ],
     "Stop": [
       {
-        "hooks": [{ "type": "command", "command": "bash /path/to/streamdeck-claude-meter/hooks/stop.sh" }]
+        "hooks": [{ "type": "command", "command": "bash /path/to/context-meter-for-stream-deck/hooks/stop.sh" }]
       }
     ]
   }
 }
 ```
 
-Replace `/path/to/streamdeck-claude-meter` with your actual clone path. Restart Claude Code for hooks to take effect.
+Replace `/path/to/context-meter-for-stream-deck` with your actual clone path. Restart Claude Code for hooks to take effect.
 
 ---
 
@@ -234,7 +234,7 @@ colours, edit the `claude` pack's `palette` there.
 ## Project structure
 
 ```
-streamdeck-claude-meter/
+context-meter-for-stream-deck/
 ├── src/
 │   ├── plugin.ts              # entry point — registers action, starts server
 │   ├── server.ts              # HTTP server on :3141
