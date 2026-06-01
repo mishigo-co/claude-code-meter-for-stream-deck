@@ -181,7 +181,7 @@ export function renderCharacter(opts: {
   const bob = Math.round(Math.sin(phase * Math.PI * 2) * 0.7); // ±1 block bob
   const blink = phase > 0.88 && phase < 0.95; // brief blink near end of cycle
 
-  const body = renderGrid(pack.base, p, bob);
+  const body = renderGrid(pack.base, p, bob * S, pack.grid ?? 12);
   let face = "";
   let extras = "";
 

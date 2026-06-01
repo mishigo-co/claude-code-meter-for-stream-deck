@@ -21,13 +21,16 @@ Pick from several characters — or import your own — in the key's settings (s
 
 ---
 
+## Privacy
+
+The plugin runs a tiny HTTP server on `127.0.0.1:3141` and listens **only** for the hook scripts in this repo. No data is sent anywhere off your machine — no telemetry, no analytics, no outbound network calls.
+
 ## Requirements
 
-- [Elgato Stream Deck](https://www.elgato.com/stream-deck) hardware
-- [Stream Deck software](https://www.elgato.com/downloads) 6.4+
-- [Claude Code](https://claude.ai/code) CLI
-- Node.js 20+ (for building; Stream Deck ships its own runtime)
-- bash + Python 3 (for hooks — standard on macOS, available via Git Bash on Windows)
+- [Elgato Stream Deck](https://www.elgato.com/stream-deck) hardware + [Stream Deck software](https://www.elgato.com/downloads) 6.4+
+- [Claude Code](https://claude.ai/code) CLI — the meter is driven by Claude Code's hook system (next section), so this is the part most setups miss. Without it the key just sits idle.
+- Node.js 20+ (for building from source; the running plugin uses the runtime that ships with Stream Deck)
+- `bash` + `python3` for the hook scripts — both standard on macOS; on Windows install [Git Bash](https://git-scm.com/download/win) and [Python 3](https://www.python.org/downloads/windows/) and make sure `bash` and `python3` resolve on `PATH`
 
 ---
 
@@ -45,15 +48,15 @@ npm run build
 ### 2. Link the plugin to Stream Deck
 
 ```bash
+npx streamdeck dev    # enables developer mode (one-time; required before linking)
 npx streamdeck link com.mishigo.context-meter.sdPlugin
-npx streamdeck dev   # enables developer mode (one-time)
 ```
 
-Then restart the Stream Deck app. The **Context Meter** action will appear in your actions list — drag it onto a key.
+Then restart the Stream Deck app. The **Context Meter** action appears in your actions list — drag it onto a key. The key will be idle until you wire the hooks in step 3.
 
-### 3. Wire up the hooks
+### 3. Wire up the Claude Code hooks
 
-Add the following to your `~/.claude/settings.json`:
+**This step is required** — without it the meter stays idle. Edit your **global** Claude Code settings at `~/.claude/settings.json` (not a project-level `.claude/settings.json`) and add a top-level `"hooks"` block:
 
 ```json
 {
@@ -61,25 +64,31 @@ Add the following to your `~/.claude/settings.json`:
     "PreToolUse": [
       {
         "matcher": "",
-        "hooks": [{ "type": "command", "command": "bash /path/to/context-meter-for-stream-deck/hooks/pre-tool-use.sh" }]
+        "hooks": [{ "type": "command", "command": "bash /absolute/path/to/context-meter-for-stream-deck/hooks/pre-tool-use.sh" }]
       }
     ],
     "PostToolUse": [
       {
         "matcher": "",
-        "hooks": [{ "type": "command", "command": "bash /path/to/context-meter-for-stream-deck/hooks/post-tool-use.sh" }]
+        "hooks": [{ "type": "command", "command": "bash /absolute/path/to/context-meter-for-stream-deck/hooks/post-tool-use.sh" }]
       }
     ],
     "Stop": [
       {
-        "hooks": [{ "type": "command", "command": "bash /path/to/context-meter-for-stream-deck/hooks/stop.sh" }]
+        "hooks": [{ "type": "command", "command": "bash /absolute/path/to/context-meter-for-stream-deck/hooks/stop.sh" }]
       }
     ]
   }
 }
 ```
 
-Replace `/path/to/context-meter-for-stream-deck` with your actual clone path. Restart Claude Code for hooks to take effect.
+- Replace `/absolute/path/to/context-meter-for-stream-deck` with your real clone path (run `pwd` inside the repo to get it). Use forward slashes even on Windows.
+- If `~/.claude/settings.json` already exists, merge the `"hooks"` key in — don't replace the whole file.
+- **Restart Claude Code** (quit and relaunch — open sessions don't pick up hook changes) for the new hooks to take effect.
+
+### 4. Verify it works
+
+In a new Claude Code session, ask Claude to run any tool (e.g. `ls`). The key should cycle: thinking face → typing bars + token count → bar fills as context grows → sparkles → idle/ZZZ on session end. Press the key to reset to zero. If nothing moves, see [Troubleshooting](#troubleshooting).
 
 ---
 
@@ -142,7 +151,7 @@ are shared in code, so every character animates the same way; packs only change 
 colours.
 
 **Pick a character** — select the key in Stream Deck and use the **Character** dropdown in the
-property inspector. Seven are bundled: Ember, Robo, Cat, Ghost, Slime, Alien, Pumpkin.
+property inspector. Eight are bundled: Ember, Robo, Cat, Ghost, Slime, Alien, Pumpkin, Mochi.
 
 **Import your own** — click **Import character…** in the property inspector and choose a `.json` pack.
 Imported packs are stored in the plugin's global settings (no files to manage) and appear in the
@@ -155,17 +164,15 @@ dropdown for every key. Bad files are rejected with an inline error.
   "schema": 1,
   "id": "robo",            // unique id; re-importing the same id replaces it
   "name": "Robo",          // shown in the dropdown
+  "grid": 24,              // optional: 12 (default, coarse) or 24 (smooth — what the bundled packs use)
   "palette": {             // all nine roles required, each a #rrggbb hex
-    "bg": "#000000", "body": "#22AACC", "shade": "#116688", "hilit": "#66E0FF",
-    "white": "#FFFFFF", "pupil": "#001824", "dark": "#002A38", "gray": "#557788", "lgray": "#99CCDD"
+    "bg": "#000000", "body": "#22AACC", "shade": "#0E4A66", "hilit": "#88E8FF",
+    "white": "#FFFFFF", "pupil": "#001824", "dark": "#012636", "gray": "#3C7F9C", "lgray": "#A8DDEF"
   },
-  // 12 rows × 12 chars. Legend: '.'=transparent  B=body S=shade H=hilit W=white D=dark G=gray L=lgray
-  "base": [
-    "....HH......", "....SS......", ".SSSSSSSSSS.", ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.", ".SBBBBBBBBS.", ".SBBBBBBBBS.", ".SSSSSSSSSS.",
-    "...S.SS.S...", "..SBBBBBBS..", "..SBBBBBBS..", "..S.SSSS.S.."
-  ],
-  // optional — nudge the shared eyes/mouth to fit your silhouette (defaults shown)
+  // N rows × N chars (N = grid). Legend: '.'=transparent  B=body S=shade H=hilit W=white D=dark G=gray L=lgray
+  "base": [ /* … */ ],
+  // optional — nudge the shared eyes/mouth to fit your silhouette (defaults shown).
+  // Anchors are in 12-grid coordinates regardless of `grid`, since the face overlay always renders at 12-grid resolution.
   "anchors": { "eyeLeftX": 3, "eyeRightX": 7, "eyesY": 3, "mouthX": 4, "mouthY": 6 }
 }
 ```
@@ -175,7 +182,10 @@ dropdown for every key. Bad files are rejected with an inline error.
 1. **Start from the template** below (or copy any bundled pack from `src/utils/characters.ts`) into a
    new file, e.g. `mychar.json`. Give it a unique `id` and a `name` for the dropdown.
 
-2. **Draw the body** in `base` — 12 rows of **exactly 12 characters**. Each character is one 6×6px block:
+2. **Pick a grid resolution.** `grid: 12` is the simplest (coarse pixel art, 6×6 px blocks). `grid: 24`
+   (3×3 px blocks) gives smoother silhouettes and room for soft shading — all bundled packs use 24.
+
+3. **Draw the body** in `base` — N rows of **exactly N characters** (N = your `grid`). Each character is one block:
 
    | Char | Block | | Char | Block |
    |------|-------|-|------|-------|
@@ -184,15 +194,16 @@ dropdown for every key. Bad files are rejected with an inline error.
    | `S` | shade (outline/shadow) | | `G` | gray |
    | `H` | highlight | | `L` | light gray |
 
-   Leave the **face zone** filled with `B`: the shared eyes land around columns 3–4 and 7–8 on rows 3–4,
-   and the mouth around columns 4–7 on row 6, so the body needs to be present behind them.
+   Leave the **face zone** filled with `B`: face overlays always render at 12-grid resolution. At
+   `grid: 12` that's cols 3–4 and 7–8 on rows 3–4 for the eyes, cols 4–7 on row 6 for the mouth. At
+   `grid: 24`, double those — cols 6–9 and 14–17 on rows 6–9 (eyes), cols 8–15 on rows 12–13 (mouth).
 
-3. **Pick colours** — set all nine `palette` roles to `#rrggbb` hex. `body` defines the look; you don't
+4. **Pick colours** — set all nine `palette` roles to `#rrggbb` hex. `body` defines the look; you don't
    choose the progress-bar colour — it's the complement of `body`, so it always contrasts.
 
-4. **(Optional) nudge the face** with `anchors` if your silhouette sits higher or lower than the default.
+5. **(Optional) nudge the face** with `anchors` if your silhouette sits higher or lower than the default.
 
-5. **Import it** — in Stream Deck select the key → **Import character…** → choose your `.json`. It's
+6. **Import it** — in Stream Deck select the key → **Import character…** → choose your `.json`. It's
    validated, added to the dropdown, and selected. Re-importing the same `id` replaces it; invalid files
    show an inline error explaining what's wrong.
 
@@ -269,9 +280,10 @@ context-meter-for-stream-deck/
 - Restart Stream Deck after linking
 
 **Animation doesn't start**
-- Check the server is running: `curl http://127.0.0.1:3141/health`
-- Check Stream Deck logs: `%APPDATA%\Elgato\StreamDeck\logs\StreamDeck.log`
-- Make sure you restarted Claude Code after editing `settings.json`
+- Check the server is running: `curl http://127.0.0.1:3141/health` (should print `ok`)
+- Send a manual ping: `curl -X POST http://127.0.0.1:3141/update -H 'Content-Type: application/json' -d '{"isThinking":true}'`. If the face animates, hooks are the problem; if not, the plugin is.
+- Check Stream Deck logs: `~/Library/Logs/ElgatoStreamDeck/` on macOS, `%APPDATA%\Elgato\StreamDeck\logs\StreamDeck.log` on Windows
+- Make sure you **quit and relaunched** Claude Code after editing `settings.json` — open sessions don't pick up hook changes
 
 **Token count not showing**
 - Verify Python 3 is available: `python3 --version`

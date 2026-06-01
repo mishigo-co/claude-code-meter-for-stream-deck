@@ -30,14 +30,20 @@ export interface CharacterPack {
   id: string;
   name: string;
   palette: Palette;
-  /** 12 rows × 12 chars, drawn via {@link LEGEND}. */
+  /** N rows × N chars (N = `grid`, default 12), drawn via {@link LEGEND}. */
   base: string[];
+  /**
+   * Body grid resolution. 12 (default) → 6px blocks; 24 → 3px blocks (smoother
+   * silhouette / shading). Face & motion stay on the 12-grid for parity.
+   */
+  grid?: 12 | 24;
   /** Optional face placement; defaults match the bundled Ember head. */
   anchors?: Partial<Anchors>;
 }
 
-export const GRID = 12; // grid width/height in blocks
-export const BLOCK = 6; // block size in px (12 × 6 = 72px canvas)
+export const GRID = 12; // default grid width/height in blocks
+export const BLOCK = 6; // default block size in px (12 × 6 = 72px canvas)
+export const CANVAS = 72;
 
 export const DEFAULT_ANCHORS: Anchors = {
   eyeLeftX: 3,
@@ -74,16 +80,23 @@ const PALETTE_ROLES: (keyof Palette)[] = [
 ];
 
 /**
- * Renders a pack's base grid to SVG rects. `dy` shifts the whole body vertically
- * (in blocks) for the bob animation. Adjacent same-colour cells in a row are
- * merged into one rect.
+ * Renders a pack's base grid to SVG rects. `dyPx` shifts the whole body
+ * vertically (in pixels) for the bob animation — kept in pixels so packs at
+ * different grid resolutions bob the same visual amount. Adjacent same-colour
+ * cells in a row are merged into one rect.
  */
-export function renderGrid(base: string[], pal: Palette, dy: number): string {
+export function renderGrid(
+  base: string[],
+  pal: Palette,
+  dyPx: number,
+  gridSize: number = GRID,
+): string {
+  const block = CANVAS / gridSize;
   let s = "";
-  for (let row = 0; row < base.length; row++) {
+  for (let row = 0; row < gridSize; row++) {
     const line = base[row];
     let col = 0;
-    while (col < GRID) {
+    while (col < gridSize) {
       const ch = line[col] ?? ".";
       const role = LEGEND[ch] ?? null;
       if (role === null) {
@@ -91,10 +104,10 @@ export function renderGrid(base: string[], pal: Palette, dy: number): string {
         continue;
       }
       let run = 1;
-      while (col + run < GRID && line[col + run] === ch) run++;
-      const x = col * BLOCK;
-      const y = (row + dy) * BLOCK;
-      s += `<rect x="${x}" y="${y}" width="${run * BLOCK}" height="${BLOCK}" fill="${pal[role]}"/>`;
+      while (col + run < gridSize && line[col + run] === ch) run++;
+      const x = col * block;
+      const y = row * block + dyPx;
+      s += `<rect x="${x}" y="${y}" width="${run * block}" height="${block}" fill="${pal[role]}"/>`;
       col += run;
     }
   }
@@ -125,13 +138,17 @@ export function validatePack(obj: unknown): ValidationResult {
     }
   }
 
-  if (!Array.isArray(o.base) || o.base.length !== GRID) {
-    return { ok: false, error: `"base" must have ${GRID} rows` };
+  const grid = o.grid === 24 ? 24 : 12;
+  if (o.grid !== undefined && o.grid !== 12 && o.grid !== 24) {
+    return { ok: false, error: `"grid" must be 12 or 24` };
   }
-  for (let i = 0; i < GRID; i++) {
+  if (!Array.isArray(o.base) || o.base.length !== grid) {
+    return { ok: false, error: `"base" must have ${grid} rows` };
+  }
+  for (let i = 0; i < grid; i++) {
     const r = o.base[i];
-    if (typeof r !== "string" || r.length !== GRID) {
-      return { ok: false, error: `base row ${i} must be ${GRID} characters` };
+    if (typeof r !== "string" || r.length !== grid) {
+      return { ok: false, error: `base row ${i} must be ${grid} characters` };
     }
     for (const ch of r) {
       if (!(ch in LEGEND)) return { ok: false, error: `base row ${i}: illegal character "${ch}"` };
@@ -144,34 +161,52 @@ export function validatePack(obj: unknown): ValidationResult {
 // ── Bundled characters ──────────────────────────────────────────────────────
 // Legend: '.'=transparent  B=body  S=shade  H=hilit  W=white  D=dark  G=gray  L=lgray
 
+// All bundled packs are drawn at 24×24 (set via `grid`) so the silhouettes have
+// smooth outlines and soft shading (H/L for highlight, G/D for shadow). The
+// face-overlay zone (cols 6–17, rows 6–15) is kept solid `B` so the procedural
+// 12-grid eyes/mouth land cleanly on every silhouette.
+
 const ember: CharacterPack = {
   schema: 1,
   id: "ember",
   name: "Ember",
+  grid: 24,
   palette: {
     bg: "#000000",
     body: "#CC2200",
-    shade: "#881100",
-    hilit: "#FF5533",
+    shade: "#5C0F00",
+    hilit: "#FF8855",
     white: "#FFFFFF",
     pupil: "#000000",
-    dark: "#440000",
-    gray: "#666666",
-    lgray: "#AAAAAA",
+    dark: "#3A0000",
+    gray: "#882211",
+    lgray: "#FFB099",
   },
   base: [
-    "..SBBBBBBS..",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    "..SBBBBBBS..",
-    ".....SS.....",
-    "...SBBBBS...",
-    "...SBBBBS...",
-    "...SSSSSS...",
+    "........................",
+    ".........SSSSSS.........",
+    ".......SSBBBBBBSS.......",
+    ".....SSLLLBBBBBBBSS.....",
+    "....SLHHHLLBBBBBBBBS....",
+    "...SSHHHHHLLBBBBBBBSS...",
+    "...SLHBBBBBBBBBBBBBBS...",
+    "..SLLHBBBBBBBBBBBBBBBS..",
+    "..SBLLBBBBBBBBBBBBBBBS..",
+    "..SBBLBBBBBBBBBBBBGBBS..",
+    "..SBBBBBBBBBBBBBBBGGGS..",
+    "..SBBBBBBBBBBBBBBBDGGS..",
+    "...SBBBBBBBBBBBBBBDDS...",
+    "...SSBBBBBBBBBBBBBDSS...",
+    "....SBBBBBBBBBBBBBDS....",
+    ".....SSBBBBBBBBBBSS.....",
+    ".......SSBBBBGGSS.......",
+    "........................",
+    ".......SSSS..SSSS.......",
+    ".......SBBS..SBBS.......",
+    ".......SBBS..SBBS.......",
+    ".......SBBS..SBBS.......",
+    ".......SSSS..SSSS.......",
+    "........................",
   ],
 };
 
@@ -179,31 +214,44 @@ const robo: CharacterPack = {
   schema: 1,
   id: "robo",
   name: "Robo",
+  grid: 24,
   palette: {
     bg: "#000000",
     body: "#22AACC",
-    shade: "#116688",
-    hilit: "#66E0FF",
+    shade: "#0E4A66",
+    hilit: "#88E8FF",
     white: "#FFFFFF",
     pupil: "#001824",
-    dark: "#002A38",
-    gray: "#557788",
-    lgray: "#99CCDD",
+    dark: "#012636",
+    gray: "#3C7F9C",
+    lgray: "#A8DDEF",
   },
-  // Boxy head with antenna, square jaw.
+  // Compact head with antenna + riveted collar + chunky shoulders body.
   base: [
-    "....HH......",
-    "....SS......",
-    ".SSSSSSSSSS.",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    ".SSSSSSSSSS.",
-    "...S.SS.S...",
-    "..SBBBBBBS..",
-    "..SBBBBBBS..",
-    "..S.SSSS.S..",
+    "...........HH...........",
+    "...........SS...........",
+    "...........SS...........",
+    "........................",
+    "....SSSSSSSSSSSSSSSS....",
+    "....SHHHLLBBBBBBBBBS....",
+    "....SHBBBBBBBBBBBBBS....",
+    "....SHBBBBBBBBBBBBBS....",
+    "....SLBBBBBBBBBBBBBS....",
+    "....SLBBBBBBBBBBBBBS....",
+    "....SBBBBBBBBBBBBBBS....",
+    "....SBBBBBBBBBBBBBBS....",
+    "....SBBBBBBBBBBBBBBS....",
+    "....SSSSSSSSSSSSSSSS....",
+    ".SSDSSSSDSSSSSSDSSSSDSS.",
+    ".SSSSSSSSSSSSSSSSSSSSSS.",
+    ".SBBBBBBBBBBBBBBGGGGGGS.",
+    ".SBBBBBBBBBBBBBBGGDDDGS.",
+    ".SBBBBBBBBBBBBBGGDDDDDS.",
+    ".SBBBBBBBBBBBBBGGDDDDDS.",
+    ".SBBBBBBBBBBBBBGGDDDDDS.",
+    ".SBBBBBBBBBBBBBBGGDDDGS.",
+    ".SSSSSSSSSSSSSSSSSSSSSS.",
+    "........................",
   ],
 };
 
@@ -211,31 +259,44 @@ const cat: CharacterPack = {
   schema: 1,
   id: "cat",
   name: "Cat",
+  grid: 24,
   palette: {
     bg: "#000000",
     body: "#E69020",
-    shade: "#A85F0E",
+    shade: "#5A2E00",
     hilit: "#FFC062",
     white: "#FFFFFF",
     pupil: "#1A1000",
     dark: "#3A2400",
-    gray: "#7A5A2A",
-    lgray: "#D8B070",
+    gray: "#9A5E20",
+    lgray: "#FFD78A",
   },
-  // Rounded head with two pointed ears.
+  // Rounded mascot head with two pointed ears (merged into the silhouette).
   base: [
-    ".S......S...",
-    ".SS....SS...",
-    ".SBS..SBS...",
-    "..SBBBBBBS..",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    "..SBBBBBBS..",
-    "...SBBBBS...",
-    "..SBBBBBBS..",
-    "..SBBBBBBS..",
-    "...SSSSSS...",
+    "......S..........S......",
+    ".....SBS........SBS.....",
+    ".....SBS........SBS.....",
+    ".....SLS........SLS.....",
+    ".....SLLSSSSSSSSBLS.....",
+    "....SLLLLLBBBBBBLLLS....",
+    ".....SLBBBBBBBBBBLS.....",
+    "....SHBBBBBBBBBBBBBS....",
+    "...SHHBBBBBBBBBBBBBBS...",
+    "..SLLHBBBBBBBBBBBBBBBS..",
+    "..SBLLBBBBBBBBBBBBBBBS..",
+    "..SBBBBBBBBBBBBBBBBBBS..",
+    "..SGGBBBBBBBBBBBBBGGGS..",
+    ".SBBBBBBBBBBBBBBBBGGGBS.",
+    "..SBBBBBBBBBBBBBBBDGGS..",
+    "..SBBBBBBBBBBBBBBBDDGS..",
+    "..SBBBBBBBBBGGDDDDDDDS..",
+    "..SBBBBBBBBBGGDDDDDDDS..",
+    "...SBBBBBBBBGGDDDDDDS...",
+    "....SBBBBBBBBGGDDDDS....",
+    ".....SBBBBBBBGGGDDS.....",
+    "......SBBBBBBBGGGS......",
+    ".......SSSSSSSSSS.......",
+    "........................",
   ],
 };
 
@@ -243,31 +304,44 @@ const ghost: CharacterPack = {
   schema: 1,
   id: "ghost",
   name: "Ghost",
+  grid: 24,
   palette: {
     bg: "#000000",
     body: "#7A5CCC",
-    shade: "#4E3A88",
-    hilit: "#B49CFF",
+    shade: "#2A1A55",
+    hilit: "#D4C2FF",
     white: "#FFFFFF",
     pupil: "#160E2E",
-    dark: "#2A1F4A",
-    gray: "#6A5A99",
-    lgray: "#C8BCEC",
+    dark: "#1F1340",
+    gray: "#5A4884",
+    lgray: "#D8CCF5",
   },
-  // Domed top, wavy skirt, no legs.
+  // Domed top, scalloped skirt, no legs.
   base: [
-    "...SBBBBS...",
-    "..SBBBBBBS..",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    ".S.SS.SS.S..",
+    ".........SSSSSS.........",
+    ".....SSLBBBBBBBBBSS.....",
+    "...SSLLLLBBBBBBBBBBSS...",
+    "..SSLHHHLLBBBBBBBBBBSS..",
+    "..SLHHHHHLLBBBBBBBBBBS..",
+    "..SLHHHHHLLBBBBBBBBBBS..",
+    "..SLHHBBBBBBBBBBBBBBBS..",
+    "..SLLHBBBBBBBBBBBBBBBS..",
+    "..SBLLBBBBBBBBBBBBBBBS..",
+    "..SBBLBBBBBBBBBBBBBBBS..",
+    "..SBBBBBBBBBBBBBBBGGBS..",
+    "..SBBBBBBBBBBBBBBBGGGS..",
+    "..SBBBBBBBBBBBBBBBDDGS..",
+    "..SBBBBBBBBBBBBBBBDDDS..",
+    "..SBBBBBBBBBBBBBBBDDDS..",
+    "..SBBBBBBBBBBBBBBBDDDS..",
+    "..SBBBBBBBBBBGGDDDDDDS..",
+    "..SBBBBBBBBBBBGGDDDDDS..",
+    "..SBBBBBBBBBBBGGGDDDGS..",
+    "..SBBBBS.SBBBBS.SGGGGS..",
+    "..SBBBBS.SBBBBS.SGGGBS..",
+    "...SBBS...SBBS...SBBS...",
+    "....SS.....SS.....SS....",
+    "........................",
   ],
 };
 
@@ -275,31 +349,44 @@ const slime: CharacterPack = {
   schema: 1,
   id: "slime",
   name: "Slime",
+  grid: 24,
   palette: {
     bg: "#000000",
     body: "#4CC24C",
-    shade: "#2E7D2E",
-    hilit: "#8FE88F",
+    shade: "#0E4A0E",
+    hilit: "#B8F5B8",
     white: "#FFFFFF",
     pupil: "#0A2A0A",
     dark: "#103010",
-    gray: "#4A6A4A",
-    lgray: "#B8E0B8",
+    gray: "#356635",
+    lgray: "#C8F0C8",
   },
-  // Rounded blob, wide drippy base.
+  // Rounded blob with three drips.
   base: [
-    "....SBBS....",
-    "...SBBBBS...",
-    "..SBBBBBBS..",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    "SBBBBBBBBBBS",
-    ".SS.SS.SS.S.",
+    "......SBBBBBBBBBBS......",
+    "......SBBBBBBBBBBS......",
+    ".....SLLLBBBBBBBBBS.....",
+    ".....SLLLLBBBBBBBBS.....",
+    ".....SHHHLLBBBBBBBS.....",
+    "....SHHHHHLLBBBBBBBS....",
+    "....SHBBBBBBBBBBBBBS....",
+    "...SLHBBBBBBBBBBBBBBS...",
+    "...SLLBBBBBBBBBBBBBBS...",
+    "...SBLBBBBBBBBBBBBBBS...",
+    "..SBBBBBBBBBBBBBBBBBBS..",
+    "..SBBBBBBBBBBBBBBBBBBS..",
+    "..SBBBBBBBBBBBBBBBGBBS..",
+    "..SBBBBBBBBBBBBBBBGGGS..",
+    ".SBBBBBBBBBBBBBBBBDGGGS.",
+    ".SBBBBBBBBBBBBBBBBDDGGS.",
+    ".SBBBBBBBBBBGGDDDDDDDGS.",
+    ".SBBBBBBBBBBGGDDDDDDDGS.",
+    ".SBBBBBBBBBBGGDDDDDDDGS.",
+    ".SBBBBBBBBBBBGGDDDDDGGS.",
+    ".SBBBBBBBBBBBGGGDDDGGGS.",
+    "...SBBBS..SBBS..SGGGS...",
+    "....SBS...SBBS...SGS....",
+    "........................",
   ],
 };
 
@@ -307,31 +394,44 @@ const alien: CharacterPack = {
   schema: 1,
   id: "alien",
   name: "Alien",
+  grid: 24,
   palette: {
     bg: "#000000",
     body: "#3FD6A6",
-    shade: "#1E9C74",
-    hilit: "#8FF0D0",
+    shade: "#0E4A38",
+    hilit: "#A8FFE0",
     white: "#FFFFFF",
     pupil: "#08221A",
     dark: "#0E3328",
-    gray: "#3A6A5A",
-    lgray: "#B0EAD8",
+    gray: "#2A8868",
+    lgray: "#C0F5DE",
   },
-  // Antennae, wide head tapering to a small body.
+  // Antennae with a single continuous teardrop body.
   base: [
-    "..H......H..",
-    "..S......S..",
-    "..SBBBBBBS..",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    "..SBBBBBBS..",
-    "...SBBBBS...",
-    "....SBBS....",
-    ".....SS.....",
-    "....SBBS....",
+    ".....H............H.....",
+    ".....S............S.....",
+    ".....S............S.....",
+    ".....S............S.....",
+    ".........SLBBBS.........",
+    ".......SHHLLBBBBS.......",
+    ".....SBBBBBBBBBBBBS.....",
+    "...SLHBBBBBBBBBBBBBBS...",
+    "..SBLLBBBBBBBBBBBBGBBS..",
+    "..SBBLBBBBBBBBBBBBGGGS..",
+    "..SBBBBBBBBBBBBBBBDGGS..",
+    "..SBBBBBBBBBBBBBBBDDGS..",
+    "...SBBBBBBBBBBBBBBDDS...",
+    "...SBBBBBBBBBBBBBBDDS...",
+    "....SBBBBBBBBBBBBBDS....",
+    "....SBBBBBBBBBBBBBDS....",
+    ".....SBBBBBBBGGGDDS.....",
+    "......SBBBBBBBGGGS......",
+    ".......SBBBBBBBBS.......",
+    "........SBBBBBBS........",
+    ".........SBBBBS.........",
+    "..........SBBS..........",
+    "........................",
+    "........................",
   ],
 };
 
@@ -339,35 +439,92 @@ const pumpkin: CharacterPack = {
   schema: 1,
   id: "pumpkin",
   name: "Pumpkin",
+  grid: 24,
   palette: {
     bg: "#000000",
     body: "#E8821A",
-    shade: "#A85A0C",
-    hilit: "#FFB259",
+    shade: "#5A2E00",
+    hilit: "#FFC85F",
     white: "#FFFFFF",
     pupil: "#2A1400",
     dark: "#3A2000",
-    gray: "#6A4A1A",
-    lgray: "#D89048",
+    gray: "#A8580A",
+    lgray: "#FFCB7A",
   },
-  // Round gourd with a stalk on top.
+  // Wide gourd with stalk and two soft ribs.
   base: [
-    ".....DD.....",
-    "..SBBBBBBS..",
-    ".SBBBBBBBBS.",
-    "SBBBBBBBBBBS",
-    "SBBBBBBBBBBS",
-    "SBBBBBBBBBBS",
-    "SBBBBBBBBBBS",
-    "SBBBBBBBBBBS",
-    ".SBBBBBBBBS.",
-    "..SBBBBBBS..",
-    "...SBBBBS...",
-    "....SSSS....",
+    "..........SSSS..........",
+    "..........SDDS..........",
+    "..........SDDS..........",
+    ".........SSSSSS.........",
+    "......SSSSBBBBSSSS......",
+    ".....SSGHLLBBBBBGSS.....",
+    "....SSBGBBBBBBBBGBSS....",
+    "...SLHBGBBBBBBBBGBBBS...",
+    "..SSLHBGBBBBBBBBGBBBSS..",
+    "..SBLLBGBBBBBBBBGBBBBS..",
+    ".SSBBLBGBBBBBBBBGBBBBSS.",
+    ".SBBBBBGBBBBBBBBGBBBBBS.",
+    ".SBBBBBGBBBBBBBBGBBBBBS.",
+    ".SBBBBBGBBBBBBBBGBGGGBS.",
+    ".SSBBBBGBBBBBBBBGBGGGGS.",
+    "..SBBBBGBBBBBBBBGBDDGSS.",
+    "..SBBBBGBBBBGGDDGDDDDS..",
+    "..SSBBBGBBBBGGDDGDDDSS..",
+    "...SBBBGBBBBGGDDGDDDS...",
+    "....SSBGBBBBGGDDGDSS....",
+    ".....SSGBBBBGGDDGSS.....",
+    "......SSSSBBGGSSSS......",
+    ".........SSSSSS.........",
+    "........................",
   ],
 };
 
-export const BUNDLED: CharacterPack[] = [ember, robo, cat, ghost, slime, alien, pumpkin];
+const mochi: CharacterPack = {
+  schema: 1,
+  id: "mochi",
+  name: "Mochi",
+  grid: 24,
+  palette: {
+    bg: "#000000",
+    body: "#F2D5C2",
+    shade: "#B47A5E",
+    hilit: "#FFE9DA",
+    white: "#FFFFFF",
+    pupil: "#2A1A14",
+    dark: "#7A4A36",
+    gray: "#C99880",
+    lgray: "#FFDFCC",
+  },
+  base: [
+    "........................",
+    "........SSSSSSSS........",
+    "......SSSBBBBBBSSS......",
+    ".....SSLLLBBBBBBBSS.....",
+    "....SSHHLLLBBBBBBBSS....",
+    "...SSHHHHLLBBBBBBBBSS...",
+    "...SLHBBBBBBBBBBBBBBS...",
+    "..SSLHBBBBBBBBBBBBBBSS..",
+    "..SLLLBBBBBBBBBBBBBBBS..",
+    "..SBLLBBBBBBBBBBBBBBBS..",
+    ".SSBBBBBBBBBBBBBBBBBBSS.",
+    ".SSBBBBBBBBBBBBBBBBBBSS.",
+    ".SSBBBBBBBBBBBBBBBGGGSS.",
+    ".SSBBBBBBBBBBBBBBBGGGSS.",
+    "..SBBBBBBBBBGGGDDDDDGS..",
+    "..SBBBBBBBBBGGDDDDDDDS..",
+    "..SSBBBBBBBBGGDDDDDDSS..",
+    "...SBBBBBBBBGGDDDDDDS...",
+    "...SSBBBBBBBGGDDDDDSS...",
+    "....SSBBBBBBGGDDDDSS....",
+    ".....SSBBBBBGGGDDSS.....",
+    "......SSSBBBBGGSSS......",
+    "........SSSSSSSS........",
+    "........................",
+  ],
+};
+
+export const BUNDLED: CharacterPack[] = [ember, robo, cat, ghost, slime, alien, pumpkin, mochi];
 
 /** Resolves a character id against bundled ∪ user packs; falls back to Ember. */
 export function resolvePack(id: string | undefined, userPacks: CharacterPack[] = []): CharacterPack {

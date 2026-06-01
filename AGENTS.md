@@ -10,7 +10,9 @@ Stream Deck plugin (Node, TypeScript). The README covers setup, hooks, and archi
 
 ## Renderer & characters
 
-The animation is rendered as SVG in `src/utils/renderCharacter.ts` (face expressions + motion, shared by all characters). The body silhouette and palette come from a data-driven **character pack** in `src/utils/characters.ts`. Packs supply only `base` (12×12 grid) + `palette`; eyes/mouth/motion stay procedural — keep that split. The `claude` pack there must stay pixel-identical to the original hand-coded body (it's derived from the old `drawBase`); the smoke-test approach in the build section guards this.
+The animation is rendered as SVG in `src/utils/renderCharacter.ts` (face expressions + motion, shared by all characters). The body silhouette and palette come from a data-driven **character pack** in `src/utils/characters.ts`. Packs supply only `base` + `palette`; eyes/mouth/motion stay procedural — keep that split.
+
+Packs can declare `grid: 12` (default, 6px blocks) or `grid: 24` (3px blocks, smoother silhouette + room for soft shading). All bundled packs are 24; imported user packs may be either. The face overlay and accessories (eyes, mouth, ZZZ, sparkles, typing bars, thinking dots) always render at 12-grid resolution — `anchors` and the bob offset are in 12-grid units regardless of body grid, so a body redrawn from 12 → 24 doesn't shift the face. When generating a 24-grid body, leave cols 6–17 / rows 6–15 solid `B` so the face overlay lands on body cells.
 
 ## Build / typecheck / reload
 
