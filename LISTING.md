@@ -3,16 +3,20 @@
 Paste-ready text for the Elgato Maker portal. Tweak to taste.
 
 ## Name
+
 Context Meter
 
 ## Subtitle / tagline (short)
+
 A live token & context meter for Claude Code, right on your Stream Deck.
 
 ## Short description (cards / search results)
+
 Watch Claude Code work from your Stream Deck. An animated character reacts as Claude thinks,
 generates, and finishes, while a bar fills to show how much of the context window you've used.
 
 ## Long description
+
 **Context Meter** turns a Stream Deck key into a live status display for [Claude Code](https://claude.ai/code).
 
 A little character reacts in real time as Claude Code works:
@@ -35,19 +39,23 @@ to a local server the plugin runs on `127.0.0.1:3141` — that's the only thing 
 leaves your machine.**
 
 ### Requirements
+
 - Elgato Stream Deck hardware + Stream Deck software 6.4+
 - [Claude Code](https://claude.ai/code) CLI
 - A one-time hook setup in `~/.claude/settings.json` (instructions in the README)
 
 ### Open source
+
 MIT-licensed. Source, character-pack format, and setup guide:
 https://github.com/mishigo-co/context-meter-for-stream-deck
 
 ## Suggested portal metadata
+
 - **Category:** Productivity (or Developer Tools, if available)
 - **Tags:** claude code, ai, llm, tokens, context, meter, developer, productivity, coding
 - **Support URL:** https://github.com/mishigo-co/context-meter-for-stream-deck
 
 ## Note on naming
+
 "Claude Code" is referenced nominatively (compatibility), not as the product name or branding. The
 product is "Context Meter"; the mascots are all generic (Ember, Robo, Cat, etc).

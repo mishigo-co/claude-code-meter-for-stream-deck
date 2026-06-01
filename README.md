@@ -8,13 +8,13 @@ A real-time token/context usage meter for [Claude Code](https://claude.ai/code),
 
 ## What it does
 
-| State | Character | Trigger |
-|---|---|---|
-| **Thinking** | Eyes up, bouncing dots | Before each tool call |
-| **Generating** | Mouth open, typing bars + token count | After each tool call |
-| **Success** | Wide eyes, sparkles, then dozes off | Session ends |
-| **Idle / sleeping** | Gentle bob, then ZZZ | No active session |
-| **Press key** | Resets to zero | Manual reset |
+| State               | Character                             | Trigger               |
+| ------------------- | ------------------------------------- | --------------------- |
+| **Thinking**        | Eyes up, bouncing dots                | Before each tool call |
+| **Generating**      | Mouth open, typing bars + token count | After each tool call  |
+| **Success**         | Wide eyes, sparkles, then dozes off   | Session ends          |
+| **Idle / sleeping** | Gentle bob, then ZZZ                  | No active session     |
+| **Press key**       | Resets to zero                        | Manual reset          |
 
 A bar across the bottom of the key fills as you consume Claude Code's context window (cap: 200k tokens).
 Pick from several characters — or import your own — in the key's settings (see [Characters](#characters)).
@@ -60,25 +60,40 @@ Then restart the Stream Deck app. The **Context Meter** action appears in your a
 
 ```json
 {
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "",
-        "hooks": [{ "type": "command", "command": "bash /absolute/path/to/context-meter-for-stream-deck/hooks/pre-tool-use.sh" }]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "",
-        "hooks": [{ "type": "command", "command": "bash /absolute/path/to/context-meter-for-stream-deck/hooks/post-tool-use.sh" }]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [{ "type": "command", "command": "bash /absolute/path/to/context-meter-for-stream-deck/hooks/stop.sh" }]
-      }
-    ]
-  }
+    "hooks": {
+        "PreToolUse": [
+            {
+                "matcher": "",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "bash /absolute/path/to/context-meter-for-stream-deck/hooks/pre-tool-use.sh"
+                    }
+                ]
+            }
+        ],
+        "PostToolUse": [
+            {
+                "matcher": "",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "bash /absolute/path/to/context-meter-for-stream-deck/hooks/post-tool-use.sh"
+                    }
+                ]
+            }
+        ],
+        "Stop": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "bash /absolute/path/to/context-meter-for-stream-deck/hooks/stop.sh"
+                    }
+                ]
+            }
+        ]
+    }
 }
 ```
 
@@ -136,7 +151,7 @@ npx streamdeck restart com.mishigo.context-meter   # restart plugin after rebuil
 50 ms tick (`src/actions/meter.ts`):
 
 ```typescript
-this.phase = (this.phase + 0.02) % 1;  // smaller = slower
+this.phase = (this.phase + 0.02) % 1; // smaller = slower
 ```
 
 For colours and the character itself, see **Characters** below.
@@ -153,27 +168,39 @@ colours.
 **Pick a character** — select the key in Stream Deck and use the **Character** dropdown in the
 property inspector. Eight are bundled: Ember, Robo, Cat, Ghost, Slime, Alien, Pumpkin, Mochi.
 
-**Import your own** — click **Import character…** in the property inspector and choose a `.json` pack.
-Imported packs are stored in the plugin's global settings (no files to manage) and appear in the
-dropdown for every key. Bad files are rejected with an inline error.
+**Import your own** — click **Import character…** in the property inspector, paste the JSON pack into
+the box that appears, and click **Import**. Imported packs are stored in the plugin's global settings
+(no files to manage) and appear in the dropdown for every key. Invalid JSON / invalid packs are
+rejected with an inline error. (The paste box is used instead of a file picker because Stream Deck's
+property-inspector webview on macOS can't reliably read user-picked files.)
 
 **Pack format** (`schema: 1`):
 
 ```jsonc
 {
-  "schema": 1,
-  "id": "robo",            // unique id; re-importing the same id replaces it
-  "name": "Robo",          // shown in the dropdown
-  "grid": 24,              // optional: 12 (default, coarse) or 24 (smooth — what the bundled packs use)
-  "palette": {             // all nine roles required, each a #rrggbb hex
-    "bg": "#000000", "body": "#22AACC", "shade": "#0E4A66", "hilit": "#88E8FF",
-    "white": "#FFFFFF", "pupil": "#001824", "dark": "#012636", "gray": "#3C7F9C", "lgray": "#A8DDEF"
-  },
-  // N rows × N chars (N = grid). Legend: '.'=transparent  B=body S=shade H=hilit W=white D=dark G=gray L=lgray
-  "base": [ /* … */ ],
-  // optional — nudge the shared eyes/mouth to fit your silhouette (defaults shown).
-  // Anchors are in 12-grid coordinates regardless of `grid`, since the face overlay always renders at 12-grid resolution.
-  "anchors": { "eyeLeftX": 3, "eyeRightX": 7, "eyesY": 3, "mouthX": 4, "mouthY": 6 }
+    "schema": 1,
+    "id": "robo", // unique id; re-importing the same id replaces it
+    "name": "Robo", // shown in the dropdown
+    "grid": 24, // optional: 12 (default, coarse) or 24 (smooth — what the bundled packs use)
+    "palette": {
+        // all nine roles required, each a #rrggbb hex
+        "bg": "#000000",
+        "body": "#22AACC",
+        "shade": "#0E4A66",
+        "hilit": "#88E8FF",
+        "white": "#FFFFFF",
+        "pupil": "#001824",
+        "dark": "#012636",
+        "gray": "#3C7F9C",
+        "lgray": "#A8DDEF",
+    },
+    // N rows × N chars (N = grid). Legend: '.'=transparent  B=body S=shade H=hilit W=white D=dark G=gray L=lgray
+    "base": [
+        /* … */
+    ],
+    // optional — nudge the shared eyes/mouth to fit your silhouette (defaults shown).
+    // Anchors are in 12-grid coordinates regardless of `grid`, since the face overlay always renders at 12-grid resolution.
+    "anchors": { "eyeLeftX": 3, "eyeRightX": 7, "eyesY": 3, "mouthX": 4, "mouthY": 6 },
 }
 ```
 
@@ -187,51 +214,58 @@ dropdown for every key. Bad files are rejected with an inline error.
 
 3. **Draw the body** in `base` — N rows of **exactly N characters** (N = your `grid`). Each character is one block:
 
-   | Char | Block | | Char | Block |
-   |------|-------|-|------|-------|
-   | `.` / space | transparent | | `D` | dark |
-   | `B` | body | | `W` | white |
-   | `S` | shade (outline/shadow) | | `G` | gray |
-   | `H` | highlight | | `L` | light gray |
+    | Char        | Block                  |     | Char | Block      |
+    | ----------- | ---------------------- | --- | ---- | ---------- |
+    | `.` / space | transparent            |     | `D`  | dark       |
+    | `B`         | body                   |     | `W`  | white      |
+    | `S`         | shade (outline/shadow) |     | `G`  | gray       |
+    | `H`         | highlight              |     | `L`  | light gray |
 
-   Leave the **face zone** filled with `B`: face overlays always render at 12-grid resolution. At
-   `grid: 12` that's cols 3–4 and 7–8 on rows 3–4 for the eyes, cols 4–7 on row 6 for the mouth. At
-   `grid: 24`, double those — cols 6–9 and 14–17 on rows 6–9 (eyes), cols 8–15 on rows 12–13 (mouth).
+    Leave the **face zone** filled with `B`: face overlays always render at 12-grid resolution. At
+    `grid: 12` that's cols 3–4 and 7–8 on rows 3–4 for the eyes, cols 4–7 on row 6 for the mouth. At
+    `grid: 24`, double those — cols 6–9 and 14–17 on rows 6–9 (eyes), cols 8–15 on rows 12–13 (mouth).
 
 4. **Pick colours** — set all nine `palette` roles to `#rrggbb` hex. `body` defines the look; you don't
    choose the progress-bar colour — it's the complement of `body`, so it always contrasts.
 
 5. **(Optional) nudge the face** with `anchors` if your silhouette sits higher or lower than the default.
 
-6. **Import it** — in Stream Deck select the key → **Import character…** → choose your `.json`. It's
-   validated, added to the dropdown, and selected. Re-importing the same `id` replaces it; invalid files
-   show an inline error explaining what's wrong.
+6. **Import it** — in Stream Deck select the key → **Import character…** → paste the JSON into the
+   textarea → **Import**. It's validated, added to the dropdown, and selected. Re-importing the same
+   `id` replaces it; invalid JSON or invalid packs show an inline error explaining what's wrong.
 
 Starter template (a plain rounded face — edit the grid and palette):
 
 ```json
 {
-  "schema": 1,
-  "id": "mychar",
-  "name": "My Character",
-  "palette": {
-    "bg": "#000000", "body": "#3366CC", "shade": "#1E3E80", "hilit": "#88AAFF",
-    "white": "#FFFFFF", "pupil": "#0A1430", "dark": "#0E1E44", "gray": "#445588", "lgray": "#AAC0F0"
-  },
-  "base": [
-    "..SBBBBBBS..",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    ".SBBBBBBBBS.",
-    "..SSSSSSSS.."
-  ]
+    "schema": 1,
+    "id": "mychar",
+    "name": "My Character",
+    "palette": {
+        "bg": "#000000",
+        "body": "#3366CC",
+        "shade": "#1E3E80",
+        "hilit": "#88AAFF",
+        "white": "#FFFFFF",
+        "pupil": "#0A1430",
+        "dark": "#0E1E44",
+        "gray": "#445588",
+        "lgray": "#AAC0F0"
+    },
+    "base": [
+        "..SBBBBBBS..",
+        ".SBBBBBBBBS.",
+        ".SBBBBBBBBS.",
+        ".SBBBBBBBBS.",
+        ".SBBBBBBBBS.",
+        ".SBBBBBBBBS.",
+        ".SBBBBBBBBS.",
+        ".SBBBBBBBBS.",
+        ".SBBBBBBBBS.",
+        ".SBBBBBBBBS.",
+        ".SBBBBBBBBS.",
+        "..SSSSSSSS.."
+    ]
 }
 ```
 
@@ -276,20 +310,24 @@ context-meter-for-stream-deck/
 ## Troubleshooting
 
 **Plugin doesn't appear in Stream Deck**
+
 - Run `npx streamdeck validate com.mishigo.context-meter.sdPlugin` and fix any errors
 - Restart Stream Deck after linking
 
 **Animation doesn't start**
+
 - Check the server is running: `curl http://127.0.0.1:3141/health` (should print `ok`)
 - Send a manual ping: `curl -X POST http://127.0.0.1:3141/update -H 'Content-Type: application/json' -d '{"isThinking":true}'`. If the face animates, hooks are the problem; if not, the plugin is.
 - Check Stream Deck logs: `~/Library/Logs/ElgatoStreamDeck/` on macOS, `%APPDATA%\Elgato\StreamDeck\logs\StreamDeck.log` on Windows
 - Make sure you **quit and relaunched** Claude Code after editing `settings.json` — open sessions don't pick up hook changes
 
 **Token count not showing**
+
 - Verify Python 3 is available: `python3 --version`
 - On Windows, confirm Git Bash is installed and `bash` is in PATH
 
 **Hooks not firing**
+
 - Confirm hooks are in `~/.claude/settings.json` (global), not a project-level file
 - Check hook paths use forward slashes, even on Windows
 

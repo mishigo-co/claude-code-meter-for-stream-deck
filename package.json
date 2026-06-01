@@ -1,17 +1,23 @@
 {
-  "name": "context-meter-for-stream-deck",
-  "version": "1.0.0",
-  "private": true,
-  "scripts": {
-    "build": "tsup",
-    "watch": "tsup --watch"
-  },
-  "dependencies": {
-    "@elgato/streamdeck": "^1.4.0"
-  },
-  "devDependencies": {
-    "@types/node": "^20.17.0",
-    "tsup": "^8.3.0",
-    "typescript": "^5.7.0"
-  }
+    "name": "context-meter-for-stream-deck",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "build": "tsup",
+        "watch": "tsup --watch",
+        "prettier": "@elgato/prettier-config",
+        "lint": "prettier . --check",
+        "lint:fix": "prettier . --write"
+    },
+    "prettier": "@elgato/prettier-config",
+    "dependencies": {
+        "@elgato/streamdeck": "^2.1.0"
+    },
+    "devDependencies": {
+        "@elgato/eslint-config": "^0.3.2",
+        "@elgato/prettier-config": "^0.3.3",
+        "@types/node": "^24.0.0",
+        "tsup": "^8.3.0",
+        "typescript": "^5.7.0"
+    }
 }

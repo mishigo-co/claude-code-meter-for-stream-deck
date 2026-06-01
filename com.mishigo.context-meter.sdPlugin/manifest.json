@@ -1,47 +1,47 @@
 {
-  "Author": "Ali Elgin",
-  "URL": "https://github.com/mishigo-co/context-meter-for-stream-deck",
-  "CodePath": "bin/plugin.js",
-  "Description": "Animated context-usage meter for Claude Code, on your Stream Deck.",
-  "Name": "Context Meter",
-  "Icon": "imgs/plugin",
-  "Category": "Context Meter",
-  "CategoryIcon": "imgs/plugin",
-  "Nodejs": {
-    "Version": "20",
-    "Debug": "enabled"
-  },
-  "SDKVersion": 2,
-  "Software": {
-    "MinimumVersion": "6.6"
-  },
-  "OS": [
-    {
-      "Platform": "windows",
-      "MinimumVersion": "10"
+    "Author": "Ali Elgin",
+    "URL": "https://github.com/mishigo-co/context-meter-for-stream-deck",
+    "CodePath": "bin/plugin.js",
+    "Description": "Animated context-usage meter for Claude Code, on your Stream Deck.",
+    "Name": "Context Meter",
+    "Icon": "imgs/plugin",
+    "Category": "Context Meter",
+    "CategoryIcon": "imgs/plugin",
+    "Nodejs": {
+        "Version": "24",
+        "Debug": "enabled"
     },
-    {
-      "Platform": "mac",
-      "MinimumVersion": "10.15"
-    }
-  ],
-  "Version": "1.0.0.0",
-  "UUID": "com.mishigo.context-meter",
-  "Actions": [
-    {
-      "UUID": "com.mishigo.context-meter.meter",
-      "Name": "Context Meter",
-      "Icon": "imgs/action",
-      "PropertyInspectorPath": "ui/inspector.html",
-      "Controllers": [
-        "Keypad"
-      ],
-      "States": [
+    "SDKVersion": 3,
+    "Software": {
+        "MinimumVersion": "7.1"
+    },
+    "OS": [
         {
-          "Image": "imgs/action",
-          "TitleAlignment": "bottom"
+            "Platform": "windows",
+            "MinimumVersion": "10"
+        },
+        {
+            "Platform": "mac",
+            "MinimumVersion": "12"
         }
-      ]
-    }
-  ]
+    ],
+    "Version": "1.0.0.0",
+    "UUID": "com.mishigo.context-meter",
+    "Actions": [
+        {
+            "UUID": "com.mishigo.context-meter.meter",
+            "Name": "Context Meter",
+            "Icon": "imgs/action",
+            "PropertyInspectorPath": "ui/inspector.html",
+            "Controllers": [
+                "Keypad"
+            ],
+            "States": [
+                {
+                    "Image": "imgs/action",
+                    "TitleAlignment": "bottom"
+                }
+            ]
+        }
+    ]
 }

@@ -6,10 +6,10 @@ SDK plugin and passes `streamdeck validate` (2 cosmetic warnings remain). This d
 ## Key decision (made)
 
 **Rebrand to a generic name.** "Claude" is Anthropic's trademark; using it as the product name +
-mascot is the main review/IP risk. We will rename the product and position it as *"works with Claude
-Code"* (nominative use), not *being* Claude.
+mascot is the main review/IP risk. We will rename the product and position it as _"works with Claude
+Code"_ (nominative use), not _being_ Claude.
 
-- Proposed name: **Context Meter**  ·  UUID: **`com.mishigo.context-meter`** (your domain) — confirm in Phase 1.
+- Proposed name: **Context Meter** · UUID: **`com.mishigo.context-meter`** (your domain) — confirm in Phase 1.
 - Mascot: keep the pixel-art character but rename the default pack off "claude".
 
 ---
@@ -18,15 +18,15 @@ Code"* (nominative use), not *being* Claude.
 
 The rename surface (already scoped):
 
-| Where | Change |
-|-------|--------|
-| `com.mishigo.claude-meter.sdPlugin/` (folder) | rename to `com.mishigo.<new>.sdPlugin` |
-| `manifest.json` | `UUID`, action `UUID`, `Name`, `Category` |
-| `src/actions/claude-meter.ts` | `@action({ UUID })`; optional file/class rename (`ClaudeMeterAction`) |
-| `tsup.config.ts` | `PLUGIN` const (output folder) |
-| `src/plugin.ts` | import path if the action file is renamed |
-| `src/utils/characters.ts` | rename the `claude` default pack id/name; keep it `BUNDLED[0]` |
-| `README.md`, `AGENTS.md` | name, UUID, paths, commands, demo image, structure |
+| Where                                         | Change                                                                |
+| --------------------------------------------- | --------------------------------------------------------------------- |
+| `com.mishigo.claude-meter.sdPlugin/` (folder) | rename to `com.mishigo.<new>.sdPlugin`                                |
+| `manifest.json`                               | `UUID`, action `UUID`, `Name`, `Category`                             |
+| `src/actions/claude-meter.ts`                 | `@action({ UUID })`; optional file/class rename (`ClaudeMeterAction`) |
+| `tsup.config.ts`                              | `PLUGIN` const (output folder)                                        |
+| `src/plugin.ts`                               | import path if the action file is renamed                             |
+| `src/utils/characters.ts`                     | rename the `claude` default pack id/name; keep it `BUNDLED[0]`        |
+| `README.md`, `AGENTS.md`                      | name, UUID, paths, commands, demo image, structure                    |
 
 - Hooks (`hooks/*.sh`) reference only `:3141` — **no change needed**.
 - `package.json` name is private/cosmetic — optional.
