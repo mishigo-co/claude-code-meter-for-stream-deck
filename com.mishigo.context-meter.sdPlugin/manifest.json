@@ -7,12 +7,23 @@
   "Icon": "icons/plugin",
   "Category": "Context Meter",
   "CategoryIcon": "icons/plugin",
-  "Nodejs": { "Version": "20", "Debug": "enabled" },
+  "Nodejs": {
+    "Version": "20",
+    "Debug": "enabled"
+  },
   "SDKVersion": 2,
-  "Software": { "MinimumVersion": "6.4" },
+  "Software": {
+    "MinimumVersion": "6.4"
+  },
   "OS": [
-    { "Platform": "windows", "MinimumVersion": "10" },
-    { "Platform": "mac", "MinimumVersion": "10.15" }
+    {
+      "Platform": "windows",
+      "MinimumVersion": "10"
+    },
+    {
+      "Platform": "mac",
+      "MinimumVersion": "10.15"
+    }
   ],
   "Version": "1.0.0.0",
   "UUID": "com.mishigo.context-meter",
@@ -22,7 +33,9 @@
       "Name": "Context Meter",
       "Icon": "icons/action",
       "PropertyInspectorPath": "ui/inspector.html",
-      "Controllers": ["Keypad"],
+      "Controllers": [
+        "Keypad"
+      ],
       "States": [
         {
           "Image": "icons/action",
