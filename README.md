@@ -1,21 +1,23 @@
-# Stream Deck Claude Meter
+# Context Meter for Stream Deck
 
-A real-time Claude API token usage meter for your Elgato Stream Deck. Animates as Claude thinks, fills as context grows, and resets cleanly between sessions — all driven by Claude Code's hook system.
+A real-time token/context usage meter for [Claude Code](https://claude.ai/code), shown on your Elgato Stream Deck. An animated character reacts as Claude Code works — thinking, generating, finishing — and a bar fills as your context grows, all driven by Claude Code's hook system.
 
-![Claude Meter demo](com.mishigo.claude-meter.sdPlugin/icons/action.png)
+![Context Meter demo](com.mishigo.context-meter.sdPlugin/icons/action.png)
 
 ---
 
 ## What it does
 
-| State | Visual | Trigger |
+| State | Character | Trigger |
 |---|---|---|
-| **Thinking** | Red snake animates through the grid | Before each tool call |
-| **In use** | Grid fills with token count | After each tool call |
-| **Idle** | Grid pulses gently | No active session |
+| **Thinking** | Eyes up, bouncing dots | Before each tool call |
+| **Generating** | Mouth open, typing bars + token count | After each tool call |
+| **Success** | Wide eyes, sparkles, then dozes off | Session ends |
+| **Idle / sleeping** | Gentle bob, then ZZZ | No active session |
 | **Press key** | Resets to zero | Manual reset |
 
-The fill level represents how much of Claude's context window you've consumed (default cap: 200k tokens).
+A bar across the bottom of the key fills as you consume Claude Code's context window (cap: 200k tokens).
+Pick from several characters — or import your own — in the key's settings (see [Characters](#characters)).
 
 ---
 
@@ -43,11 +45,11 @@ npm run build
 ### 2. Link the plugin to Stream Deck
 
 ```bash
-npx streamdeck link com.mishigo.claude-meter.sdPlugin
+npx streamdeck link com.mishigo.context-meter.sdPlugin
 npx streamdeck dev   # enables developer mode (one-time)
 ```
 
-Then restart the Stream Deck app. The **Claude Meter** action will appear in your actions list — drag it onto a key.
+Then restart the Stream Deck app. The **Context Meter** action will appear in your actions list — drag it onto a key.
 
 ### 3. Wire up the hooks
 
@@ -93,10 +95,10 @@ Claude Code lifecycle hooks
   Plugin HTTP server (server.ts)
          │
          ▼
-  ClaudeMeterAction state update
+  ContextMeterAction state update
          │
          ▼
-  50ms tick → renderFrame() → setImage()
+  50ms tick → renderCharacter() → setImage()
          │
          ▼
   Stream Deck key display
@@ -104,8 +106,8 @@ Claude Code lifecycle hooks
 
 Three hooks drive the meter:
 
-- **`pre-tool-use.sh`** — Fires before every tool call. Sends `{ isThinking: true }` → starts the snake animation.
-- **`post-tool-use.sh`** — Fires after every tool call. Parses the token count from stdin and sends `{ tokens: N }` → fills the grid.
+- **`pre-tool-use.sh`** — Fires before every tool call. Sends `{ isThinking: true }` → the character starts thinking.
+- **`post-tool-use.sh`** — Fires after every tool call. Parses the token count from stdin and sends `{ tokens: N }` → fills the bar.
 - **`stop.sh`** — Fires on session end or `/clear`. Sends the final token count or resets to idle.
 
 The plugin runs a lightweight HTTP server on `127.0.0.1:3141`. The hooks are the only clients — nothing is sent to any external service.
@@ -116,13 +118,13 @@ The plugin runs a lightweight HTTP server on `127.0.0.1:3141`. The hooks are the
 
 ```bash
 npm run watch        # rebuild on file changes
-npx streamdeck restart com.mishigo.claude-meter   # restart plugin after rebuild
+npx streamdeck restart com.mishigo.context-meter   # restart plugin after rebuild
 ```
 
 ### Customisation
 
 **Animation speed** — in `src/utils/renderCharacter.ts`, change the phase increment in the
-50 ms tick (`src/actions/claude-meter.ts`):
+50 ms tick (`src/actions/meter.ts`):
 
 ```typescript
 this.phase = (this.phase + 0.02) % 1;  // smaller = slower
@@ -140,7 +142,7 @@ are shared in code, so every character animates the same way; packs only change 
 colours.
 
 **Pick a character** — select the key in Stream Deck and use the **Character** dropdown in the
-property inspector. Seven are bundled: Claude, Robo, Cat, Ghost, Slime, Alien, Pumpkin.
+property inspector. Seven are bundled: Ember, Robo, Cat, Ghost, Slime, Alien, Pumpkin.
 
 **Import your own** — click **Import character…** in the property inspector and choose a `.json` pack.
 Imported packs are stored in the plugin's global settings (no files to manage) and appear in the
@@ -237,7 +239,7 @@ streamdeck-claude-meter/
 │   ├── plugin.ts              # entry point — registers action, starts server
 │   ├── server.ts              # HTTP server on :3141
 │   ├── actions/
-│   │   └── claude-meter.ts    # Stream Deck action, 50ms animation tick
+│   │   └── meter.ts           # Stream Deck action, 50ms animation tick
 │   ├── ui/
 │   │   └── inspector.ts       # property inspector logic (bundled to browser)
 │   └── utils/
@@ -247,7 +249,7 @@ streamdeck-claude-meter/
 │   ├── pre-tool-use.sh        # fires before each tool call
 │   ├── post-tool-use.sh       # fires after each tool call
 │   └── stop.sh                # fires on session end
-├── com.mishigo.claude-meter.sdPlugin/
+├── com.mishigo.context-meter.sdPlugin/
 │   ├── manifest.json          # Stream Deck plugin manifest
 │   ├── bin/plugin.js          # compiled plugin bundle (generated)
 │   ├── ui/
@@ -263,7 +265,7 @@ streamdeck-claude-meter/
 ## Troubleshooting
 
 **Plugin doesn't appear in Stream Deck**
-- Run `npx streamdeck validate com.mishigo.claude-meter.sdPlugin` and fix any errors
+- Run `npx streamdeck validate com.mishigo.context-meter.sdPlugin` and fix any errors
 - Restart Stream Deck after linking
 
 **Animation doesn't start**

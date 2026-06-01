@@ -31,6 +31,6 @@ export function startServer(port: number, onUpdate: (u: Update) => void): void {
   });
 
   server.listen(port, "127.0.0.1", () => {
-    console.log(`Claude Meter server listening on http://127.0.0.1:${port}`);
+    console.log(`Context Meter server listening on http://127.0.0.1:${port}`);
   });
 }

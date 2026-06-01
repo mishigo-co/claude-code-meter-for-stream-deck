@@ -1,4 +1,4 @@
-// Property Inspector logic. Bundled to com.mishigo.claude-meter.sdPlugin/ui/inspector.js
+// Property Inspector logic. Bundled to com.mishigo.context-meter.sdPlugin/ui/inspector.js
 // (browser target) by tsup. Talks to the plugin via the SDK's fetch/route RPC.
 
 import streamDeck from "@elgato/streamdeck";

@@ -1,7 +1,7 @@
 node_modules/
-com.mishigo.claude-meter.sdPlugin/bin/
-com.mishigo.claude-meter.sdPlugin/ui/inspector.js
-com.mishigo.claude-meter.sdPlugin/logs/
+com.mishigo.context-meter.sdPlugin/bin/
+com.mishigo.context-meter.sdPlugin/ui/inspector.js
+com.mishigo.context-meter.sdPlugin/logs/
 logs/
 .claude/
 gif-preview/

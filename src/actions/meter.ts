@@ -25,8 +25,8 @@ interface GlobalSettings {
 
 type CharState = "idle" | "thinking" | "generating" | "success" | "sleeping";
 
-@action({ UUID: "com.mishigo.claude-meter.meter" })
-export class ClaudeMeterAction extends SingletonAction<Settings> {
+@action({ UUID: "com.mishigo.context-meter.meter" })
+export class ContextMeterAction extends SingletonAction<Settings> {
   private _action?: Action<Settings>;
   private timer?: ReturnType<typeof setInterval>;
   private phase = 0;

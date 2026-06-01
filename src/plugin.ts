@@ -1,8 +1,8 @@
 import streamDeck from "@elgato/streamdeck";
-import { ClaudeMeterAction } from "./actions/claude-meter.js";
+import { ContextMeterAction } from "./actions/meter.js";
 import { startServer } from "./server.js";
 
-const meter = new ClaudeMeterAction();
+const meter = new ContextMeterAction();
 
 startServer(3141, (update) => {
   if (update.reset) {

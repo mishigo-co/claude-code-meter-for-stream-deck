@@ -1,6 +1,6 @@
 import { defineConfig } from "tsup";
 
-const PLUGIN = "com.mishigo.claude-meter.sdPlugin";
+const PLUGIN = "com.mishigo.context-meter.sdPlugin";
 
 export default defineConfig([
   // Plugin process (Node).

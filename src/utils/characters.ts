@@ -32,7 +32,7 @@ export interface CharacterPack {
   palette: Palette;
   /** 12 rows × 12 chars, drawn via {@link LEGEND}. */
   base: string[];
-  /** Optional face placement; defaults match the bundled Claude head. */
+  /** Optional face placement; defaults match the bundled Ember head. */
   anchors?: Partial<Anchors>;
 }
 
@@ -144,10 +144,10 @@ export function validatePack(obj: unknown): ValidationResult {
 // ── Bundled characters ──────────────────────────────────────────────────────
 // Legend: '.'=transparent  B=body  S=shade  H=hilit  W=white  D=dark  G=gray  L=lgray
 
-const claude: CharacterPack = {
+const ember: CharacterPack = {
   schema: 1,
-  id: "claude",
-  name: "Claude",
+  id: "ember",
+  name: "Ember",
   palette: {
     bg: "#000000",
     body: "#CC2200",
@@ -367,9 +367,9 @@ const pumpkin: CharacterPack = {
   ],
 };
 
-export const BUNDLED: CharacterPack[] = [claude, robo, cat, ghost, slime, alien, pumpkin];
+export const BUNDLED: CharacterPack[] = [ember, robo, cat, ghost, slime, alien, pumpkin];
 
-/** Resolves a character id against bundled ∪ user packs; falls back to Claude. */
+/** Resolves a character id against bundled ∪ user packs; falls back to Ember. */
 export function resolvePack(id: string | undefined, userPacks: CharacterPack[] = []): CharacterPack {
   return [...BUNDLED, ...userPacks].find((p) => p.id === id) ?? BUNDLED[0];
 }

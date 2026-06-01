@@ -1,10 +1,10 @@
 {
   "Author": "Ali Elgin",
   "CodePath": "bin/plugin.js",
-  "Description": "Animated Claude API usage meter for Stream Deck",
-  "Name": "Claude Meter",
+  "Description": "Animated context-usage meter for Claude Code, on your Stream Deck.",
+  "Name": "Context Meter",
   "Icon": "icons/plugin",
-  "Category": "Claude Meter",
+  "Category": "Context Meter",
   "CategoryIcon": "icons/plugin",
   "Nodejs": { "Version": "20", "Debug": "enabled" },
   "SDKVersion": 2,
@@ -14,11 +14,11 @@
     { "Platform": "mac", "MinimumVersion": "10.15" }
   ],
   "Version": "1.0.0.0",
-  "UUID": "com.mishigo.claude-meter",
+  "UUID": "com.mishigo.context-meter",
   "Actions": [
     {
-      "UUID": "com.mishigo.claude-meter.meter",
-      "Name": "Claude Meter",
+      "UUID": "com.mishigo.context-meter.meter",
+      "Name": "Context Meter",
       "Icon": "icons/action",
       "PropertyInspectorPath": "ui/inspector.html",
       "Controllers": ["Keypad"],

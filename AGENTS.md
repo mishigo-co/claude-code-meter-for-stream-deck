@@ -16,7 +16,7 @@ The animation is rendered as SVG in `src/utils/renderCharacter.ts` (face express
 
 - `npm run build` runs **two** tsup builds: the Node plugin → `bin/plugin.js`, and the browser property inspector (`src/ui/inspector.ts` → `ui/inspector.js`). The plugin build has `clean: true`; the PI build has `clean: false` so it doesn't wipe the committed `ui/inspector.html`. Generated `bin/` and `ui/inspector.js` are gitignored — never hand-edit.
 - **`tsc --noEmit` is NOT a usable gate here.** The `@elgato/streamdeck` package has a dual `exports` map (`browser` + `default`); under `moduleResolution: NodeNext`, `tsc` resolves *every* file to the **browser** types, so the plugin's `SingletonAction`/`@action`/event imports all report "no exported member". esbuild (tsup) resolves correctly per `platform` (`node` for the plugin, `browser` for the PI) — it is the real build gate, but it strips types and never type-checks. To actually exercise pure logic (renderer + packs), bundle a throwaway entry with `npx esbuild <file> --bundle --platform=node` and run it.
-- After a rebuild the running plugin keeps the old bundle. Run `npx streamdeck restart com.mishigo.claude-meter` to load changes.
+- After a rebuild the running plugin keeps the old bundle. Run `npx streamdeck restart com.mishigo.context-meter` to load changes.
 
 ## Hooks
 
